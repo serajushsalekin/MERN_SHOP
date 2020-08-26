@@ -3,11 +3,18 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const mongoose = require('mongoose')
 
 // env file
 var env = require('dotenv')
 env.config()
 
+// db
+const url = "mongodb://localhost:27017/mern_shop"
+const connect = mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true})
+connect.then(db => console.log("Connected to db successfully")).catch(err=> console.log(err))
+
+// router import
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
@@ -23,6 +30,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+// router
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
