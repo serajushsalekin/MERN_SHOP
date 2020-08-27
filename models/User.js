@@ -23,7 +23,6 @@ const userSchema = new Schema({
         type: String,
         required: true,
         trim: true,
-        unique: true,
         index: true,
         lowercase: true
     },
@@ -55,8 +54,13 @@ const userSchema = new Schema({
 userSchema.virtual('password').set(function(password){
     this.hash_password = bcrypt.hashSync(password, 10);
 })
+
+userSchema.virtual('fullname').get(function(){
+    return `${this.firstName} ${this.lastName}`
+})
+
 userSchema.methods = {
-    authenticate: password => {return bcrypt.compareSync(password, this.hash_password)}
+    authenticate: function(password) {return bcrypt.compareSync(password, this.hash_password)}
 }
 const users = mongoose.model('User', userSchema)
 module.exports = users

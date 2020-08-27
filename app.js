@@ -17,6 +17,7 @@ connect.then(db => console.log("Connected to db successfully")).catch(err=> cons
 // router import
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var adminRouter = require('./routes/admin');
 
 var app = express();
 
@@ -33,6 +34,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // router
 app.use('/', indexRouter);
+app.use('/admin', adminRouter);
 app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
