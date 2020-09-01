@@ -1,4 +1,6 @@
 const jwt = require('jsonwebtoken')
+const {registerValidator, loginValidator} = require('../validators/auth')
+
 
 // model
 const User = require('../models/User');
@@ -17,6 +19,10 @@ exports.login_required = (req, res, next) => {
 
 
 exports.signup = (req, res, next) => {
+    const { errors, isValid } = registerValidator(req.body)
+    if(!isValid){
+      return res.status(400).json(errors)
+    }
     User.findOne({email: req.body.email}).then(user => {
       if (user) {
         return res.status(400).json({message: "user already exists!"})
@@ -38,7 +44,11 @@ exports.signup = (req, res, next) => {
 
 // Admin Signup
 exports.register = (req, res, next) => {
-    User.findOne({email: req.body.email}).then(user => {
+  const { errors, isValid } = registerValidator(req.body)
+    if(!isValid){
+      return res.status(400).json(errors)
+  }  
+  User.findOne({email: req.body.email}).then(user => {
       if (user) {
         return res.status(400).json({message: "user already exists!"})
       }
@@ -59,7 +69,11 @@ exports.register = (req, res, next) => {
 }
 
 exports.signin = (req, res, next) => {
-    User.findOne({email: req.body.email}).then(user => {
+  const { errors, isValid } = loginValidator(req.body)
+    if(!isValid){
+      return res.status(400).json(errors)
+  }  
+  User.findOne({email: req.body.email}).then(user => {
       if (user) {
         if (user.authenticate(req.body.password)) {
           const token = jwt.sign({_id: user._id}, process.env.JWT_SECRET_KEY, { expiresIn: '2h'})
