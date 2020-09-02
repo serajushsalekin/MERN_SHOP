@@ -6,15 +6,29 @@ const {registerValidator, loginValidator} = require('../validators/auth')
 const User = require('../models/User');
 
 exports.login_required = (req, res, next) => {
-    try {
-        const token = req.headers.authorization.split(' ')[1]
-        const user = jwt.verify(token, process.env.JWT_SECRET_KEY)
-        req.user = user
-        next()   
-    } catch (error) {
-        next(error)
-    }
-   
+  if (req.headers.authorization) {
+    const token = req.headers.authorization.split(' ')[1]
+    const user = jwt.verify(token, process.env.JWT_SECRET_KEY)
+    req.user = user
+  }
+  else {
+    return res.status(503).json({message: "Access Denied!"})
+  }
+  next()
+}
+
+exports.user_permission_mixin = (req, res, next) => {
+  if (req.user.role !== 'user') {
+    return res.status(503).json({message: "User Access Denied!"})
+  }
+  next()
+}
+
+exports.admin_permission_mixin = (req, res, next) => {
+  if (req.user.role !== "admin") {
+    return res.status(503).json({message: "Admin Access Denied!"})
+  }
+  next()
 }
 
 
@@ -76,7 +90,7 @@ exports.signin = (req, res, next) => {
   User.findOne({email: req.body.email}).then(user => {
       if (user) {
         if (user.authenticate(req.body.password)) {
-          const token = jwt.sign({_id: user._id}, process.env.JWT_SECRET_KEY, { expiresIn: '2h'})
+          const token = jwt.sign({_id: user._id, role: user.role}, process.env.JWT_SECRET_KEY, { expiresIn: '2h'})
           const { _id, fullname, email, role } = user
           return res.status(200).json({token, user: { _id,fullname, email, role }})
         }
