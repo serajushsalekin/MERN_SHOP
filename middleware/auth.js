@@ -12,21 +12,21 @@ exports.login_required = (req, res, next) => {
     req.user = user
   }
   else {
-    return res.status(503).json({message: "Access Denied!"})
+    return res.status(401).json({message: "Access Denied!"})
   }
   next()
 }
 
 exports.user_permission_mixin = (req, res, next) => {
-  if (req.user.role !== 'user') {
-    return res.status(503).json({message: "User Access Denied!"})
+  if (req.user.role !== 'user' && req.user.role !== 'admin') {
+    return res.status(401).json({message: "User Access Denied!"})
   }
   next()
 }
 
 exports.admin_permission_mixin = (req, res, next) => {
   if (req.user.role !== "admin") {
-    return res.status(503).json({message: "Admin Access Denied!"})
+    return res.status(401).json({message: "Admin Access Denied!"})
   }
   next()
 }

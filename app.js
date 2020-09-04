@@ -11,14 +11,16 @@ env.config()
 
 // db
 const url = "mongodb://localhost:27017/mern_shop"
-const connect = mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true})
+const connect = mongoose.connect(url, {useNewUrlParser: true, useFindAndModify: false, useUnifiedTopology: true, useCreateIndex: true})
 connect.then(db => console.log("Connected to db successfully")).catch(err=> console.log(err))
 
 // router import
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var adminRouter = require('./routes/admin');
+var productRouter = require('./routes/products');
 var categoryRouter = require('./routes/categories');
+var cartRouter = require('./routes/cart');
 
 var app = express();
 
@@ -37,7 +39,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/admin', adminRouter);
 app.use('/users', usersRouter);
+app.use('/product', productRouter);
 app.use('/category', categoryRouter);
+app.use('/cart', cartRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
