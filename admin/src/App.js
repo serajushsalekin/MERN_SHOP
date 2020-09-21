@@ -1,20 +1,31 @@
 import React, {Component} from 'react';
 import Layout from "./components/Layout";
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 import Login from "./components/auth/login";
 import Register from "./components/auth/register";
+import PrivateRoute from './router/restrict';
+import { connect } from 'react-redux';
+import { loggedIn } from "./redux/auth/authAction";
 
 
 class App extends Component{
+
+  componentDidMount(){
+    const { auth } = this.props
+    if (!auth.authenticate) {
+        this.props.loggedIn()
+    }
+  }
+ 
+  
   render() {
     return (
-        <Router>
-          <Switch>
-              <Route path='/login' component={Login}/>
-              <Route path='/signup' component={Register} />
-            <Layout />
-          </Switch>
-        </Router>
+        <Switch>
+            <Route path='/login' component={Login}/>
+            <Route path='/signup' component={Register} />
+            <PrivateRoute component={Layout} />
+          {/* <Layout /> */}
+        </Switch>
 
         // <Router>
         //   <React.Suspense fallback={loading}>
@@ -31,5 +42,11 @@ class App extends Component{
     );
   }
 }
+const mapStateToProps = state => ({
+  auth: state.auth
+})
 
-export default App;
+const mapStateToDispatch = dispatch => ({
+  loggedIn: () => dispatch(loggedIn())
+})
+export default connect(mapStateToProps, mapStateToDispatch)(App)

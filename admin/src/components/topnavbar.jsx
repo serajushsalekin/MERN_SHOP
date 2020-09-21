@@ -1,7 +1,14 @@
 import React, {Component} from "react";
+import { connect } from "react-redux";
 import {Link} from "react-router-dom";
+import {logout} from '../redux/auth/authAction'
+
 
 class Topnavbar extends Component{
+
+    logout = () => {
+        this.props.logout()
+    }
     render() {
         return (
 <header id="navbar">
@@ -131,7 +138,7 @@ class Topnavbar extends Component{
                                 <Link to="#"> <i className="fa fa-gear fa-fw fa-lg"></i> Settings </Link>
                             </li>
                             <li>
-                                <Link to="#"> <i className="fa fa-sign-out fa-fw"></i> Logout </Link>
+                                <Link to="/logout" onClick={()=> this.logout()}> <i className="fa fa-sign-out fa-fw"></i> Logout </Link>
                             </li>
                         </ul>
                     </div>
@@ -143,5 +150,7 @@ class Topnavbar extends Component{
         )
     }
 }
-
-export default Topnavbar
+const mapStateToDispatch = dispatch => ({
+    logout: ()=> dispatch(logout())
+})
+export default connect(null, mapStateToDispatch)(Topnavbar)
